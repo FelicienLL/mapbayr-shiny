@@ -13,7 +13,7 @@ Fortunately, if R is installed on your computer, you can run them locally!
 First, make sure **shiny**, **mrgsolve** and **mapbayr** packages are installed on your computer.
 Then, choose the application you want to run with `runGitHub()`. For instance: 
 ```r
-shiny::runGitHub("mapbayr-shiny", "FelicienLL", subdir = "901-carboplatin")
+shiny::runGitHub("mapbayr-shiny", "FelicienLL", subdir = "901-carboplatin", ref = "main")
 ```
 
 You can also clone or download the repository on your machine.
