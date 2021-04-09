@@ -38,8 +38,7 @@ adapt_pazo <- function(est, ii, target, ss){
       })
   
   TAB <- data.frame(
-    Dose = as.integer(inputsim$iAMT), 
-    Schedule = ifelse(inputsim$iII == 24, "1/day", "2/day"), 
+    Schedule = paste0(inputsim$iAMT, "mg/", inputsim$iII, "h"),
     Concentration = iCONC
   ) %>% 
     dplyr::arrange(Concentration)
