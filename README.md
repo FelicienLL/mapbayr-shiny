@@ -18,6 +18,9 @@ shiny::runGitHub("mapbayr-shiny", "FelicienLL", ref = "main", subdir = "901-carb
 
 You can also clone or download the repository on your machine.
 
+![](appshiny901.png)<!-- -->
+
+
 ### Warning !
 
 These application are provided **for illustrative purpose only**! Although they may be based on models built from clinical data, they should not be used to directly to individualize doses of patients. These applications are distributed **without any warantee**.

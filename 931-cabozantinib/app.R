@@ -10,7 +10,7 @@ my_model <- mread("mrg_931.cpp")
 # - a posteriori "Adaptation" function(s): return a dose recommendation, a comment, a specific figure...
 
 adapt_cabo <- function(est, ii, target, ss){
-  stopifnot(inherits(est, "mbrests"))
+  stopifnot(inherits(est, "mapbayests"))
   
   # 1- Return the trough concentration at steady-state
   tab <- est$mapbay_tab
@@ -26,11 +26,9 @@ adapt_cabo <- function(est, ii, target, ss){
   iCONC <- inputsim %>% 
     purrr::pmap_dbl(
       function(iAMT, iII, iADDL, iTSIM){
-        est$model %>% 
-          adm_lines(amt = iAMT, ii = iII, addl = iADDL) %>%
-          zero_re() %>% 
-          param(as.list(est$final_eta[[1]])) %>% 
-          add_covariates(as.list(tab[1, mapbayr:::mbr_cov_names(est$model)])) %>% 
+        est %>% 
+          use_posterior() %>% 
+          adm_lines(amt = iAMT, ii = iII, addl = iADDL, realize_addl = TRUE) %>%
           obsonly() %>% 
           mrgsim(start = iTSIM, end = iTSIM) %>% 
           as.data.frame() %>% 
@@ -115,11 +113,11 @@ server <- function(input, output) {
       obs_lines(time = (input$time1 + tldos), DV = input$dv1) %>%
       obs_lines(time = (input$ii + tldos), DV = NA_real_, mdv = 1) %>% 
       add_covariates(list_cov) %>%
-      see_data()
+      get_data()
   })
   
   my_est <- eventReactive(input$GO, {
-    mbrest(my_model, my_data(), verbose = F)
+    mapbayest(my_model, my_data(), verbose = F)
   })
   
   my_adapt <- reactive({
@@ -139,14 +137,14 @@ server <- function(input, output) {
     }
   })
   output$concvstime <- renderPlot({
-    mapbayr:::plot.mbrests(my_est())+ggplot2::geom_hline(yintercept = input$target, linetype = 2)
+    mapbayr:::plot.mapbayests(my_est())+ggplot2::geom_hline(yintercept = input$target, linetype = 2)
     #We can also use :
     # shiny::req(my_est())
     # plot(my_est())
   })
   
   output$distparam <- renderPlot({
-    mapbayr:::hist.mbrests(my_est())
+    mapbayr:::hist.mapbayests(my_est())
   })
   
   output$results_txt <- renderText({
