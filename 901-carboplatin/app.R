@@ -116,10 +116,9 @@ server <- function(input, output) {
   })
   
   output$concvstime <- renderPlot({
-    mapbayr:::plot.mapbayests(my_est())
-    #We can also use :
-    # shiny::req(my_est())
-    # plot(my_est())
+   shiny::req(my_est())
+   plot(my_est())+
+     ggplot2::scale_x_continuous(limits = c(0, 12))
   })
   
   output$distparam <- renderPlot({
