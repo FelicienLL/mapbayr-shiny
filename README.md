@@ -13,7 +13,7 @@ Fortunately, if R is installed on your computer, you can run them locally!
 First, make sure **shiny**, **mrgsolve** and **mapbayr** packages are installed on your computer.
 Then, choose the application you want to run with `runGitHub()`. For instance: 
 ```r
-shiny::runGitHub("mapbayr-shiny", "FelicienLL", ref = "main", subdir = "901-carboplatin")
+shiny::runGitHub("mapbayr-shiny", "FelicienLL", subdir = "901-carboplatin", ref = "main")
 ```
 
 You can also clone or download the repository on your machine.
@@ -23,7 +23,7 @@ You can also clone or download the repository on your machine.
 
 ### Warning !
 
-These application are provided **for illustrative purpose only**! Although they may be based on models built from clinical data, they should not be used to directly to individualize doses of patients. These applications are distributed **without any warantee**.
+These applications are provided **for illustrative purpose only**! Although they may be based on models built from clinical data, they should not be used to directly to individualize doses of patients. These applications are distributed **without any warantee**.
 
 ### Want to create your own app?
 Feel free to start from these examples instead of coding one from scratch. Contact us through the [issue tracker of mapbayr](https://github.com/FelicienLL/mapbayr/issues) for any question or suggestion !
