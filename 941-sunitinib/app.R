@@ -10,7 +10,7 @@ my_model <- mread("mrg_941.cpp")
 # - a posteriori "Adaptation" function(s): return a dose recommendation, a comment, a specific figure...
 
 adapt_suni <- function(est, ii, target, ss){
-  stopifnot(inherits(est, "mbrests"))
+  stopifnot(inherits(est, "mapbayests"))
   
   # 1- Return the trough concentration at steady-state
   tab <- est$mapbay_tab
@@ -26,17 +26,14 @@ adapt_suni <- function(est, ii, target, ss){
   iCONC <- inputsim %>% 
     purrr::pmap_dbl(
       function(iAMT, iII, iADDL, iTSIM){
-       tab <- est$model %>% 
+        tab <- est %>% 
+          use_posterior() %>% 
           adm_lines(amt = iAMT, ii = iII, addl = iADDL) %>%
-          zero_re() %>% 
-          param(as.list(est$final_eta[[1]])) %>% 
-          add_covariates() %>% 
           obsonly() %>% 
           mrgsim(start = iTSIM, end = iTSIM) %>% 
           as.data.frame()
-       
-       sum(tab$PAR, tab$MET)
-          
+        
+        sum(tab$PAR, tab$MET)
       })
   
   TAB <- data.frame(
@@ -69,8 +66,10 @@ ui <- fluidPage(
         column(width = 6, numericInput("dv1", "Concentration (mg/L)", 19.1)),
         column(width = 6, numericInput("dv1met", "Concentration (mg/L)", 12.6))
       ),
+      h4("Covariates"),
+      numericInput("WT", "Body weight (kg)", 70),
       h4("Target"),
-     # numericInput("target", "Target concentration (mg/L)", 37.5),
+      # numericInput("target", "Target concentration (mg/L)", 37.5),
       numericInput("ss", "Steady-state (days)", 30),
       h4("Perfom estimation"),
       actionButton("GO", "Let's GO !")
@@ -99,12 +98,12 @@ server <- function(input, output) {
       adm_lines(time = 0, amt = input$amt, ii = input$ii, addl = (input$addl)-1) %>%
       obs_lines(time = (input$time1 + tldos), DV = input$dv1, DVmet = input$dv1met) %>%
       obs_lines(time = (input$ii + tldos), DV = NA_real_, DVmet = NA_real_, mdv = 1) %>% 
-      add_covariates() %>%
-      see_data()
+      add_covariates(covariates = list(WT = input$WT)) %>%
+      get_data()
   })
   
   my_est <- eventReactive(input$GO, {
-    mbrest(my_model, my_data(), verbose = F)
+    mapbayest(my_model, my_data(), verbose = F)
   })
   
   my_adapt <- reactive({
@@ -124,14 +123,14 @@ server <- function(input, output) {
     }
   })
   output$concvstime <- renderPlot({
-    mapbayr:::plot.mbrests(my_est())
+    mapbayr:::plot.mapbayests(my_est())
     #We can also use :
     # shiny::req(my_est())
     # plot(my_est())
   })
   
   output$distparam <- renderPlot({
-    mapbayr:::hist.mbrests(my_est())
+    mapbayr:::hist.mapbayests(my_est())
   })
   
   output$results_txt <- renderText({

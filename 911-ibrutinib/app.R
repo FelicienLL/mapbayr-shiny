@@ -10,8 +10,8 @@ my_model <- mread("ibru_911.cpp")
 # - a posteriori "Adaptation" function(s): to return a dose recommendation, a comment, a specific figure...
 
 adapt_ibru <- function(est, dose){
-  stopifnot(inherits(est, "mbrests"))
-  CLF <- as.data.frame(est)[1, "CLF"]
+  stopifnot(inherits(est, "mapbayests"))
+  CLF <- get_param(est, "CLF")
   AUC <- 1000*dose / CLF
   
   paste0("Oral clearance: ", round(CLF, 1), " L/h.", "\n",
@@ -86,11 +86,11 @@ server <- function(input, output) {
                 DV = c(input$dv1, input$dv2, input$dv3),
                 DVmet = c(input$dv1met, input$dv2met, input$dv3met)) %>%
       add_covariates(list(BSA = input$bsa)) %>%
-      see_data()
+      get_data()
   })
   
   my_est <- eventReactive(input$GO, {
-    mbrest(my_model, my_data(), verbose = F)
+    mapbayest(my_model, my_data(), verbose = F)
   })
   
   output$mapbay_tab <- renderTable({
@@ -117,7 +117,7 @@ server <- function(input, output) {
   })
   
   output$distparam <- renderPlot({
-    mapbayr:::hist.mbrests(my_est())
+    mapbayr:::hist.mapbayests(my_est())
   })
 }
 

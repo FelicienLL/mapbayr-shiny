@@ -10,8 +10,9 @@ my_model <- mread("mrg_901.cpp")
 # - a posteriori "Adaptation" function(s): return a dose recommendation, a comment, a specific figure...
 
 adapt_carboplatin <- function(est, target_auc, dose_d1){
-  stopifnot(inherits(est, "mbrests"))
-  CL <- (1000/60) * as.data.frame(est)[1, "CL"]
+  stopifnot(inherits(est, "mapbayests"))
+  CL <- get_param(est, "CL")*(1000/60)
+  
   AUC_D1 <- dose_d1 / CL
   AUC_D2 <- AUC_D1
   AUC_D3 <- target_auc - (AUC_D2 + AUC_D1)
@@ -19,8 +20,8 @@ adapt_carboplatin <- function(est, target_auc, dose_d1){
   if(DOSE_D3<=0) DOSE_D3 <- 0
   
   paste0("Patient's clearance: ", round(CL), " mL/min.", "\n",
-         "AUC Day 1: ", round(AUC_D1, 2), " mg.h/mL.", "\n",
-         "Dose at day 3 to reach a target AUC of ", target_auc, " mg.h/mL over 3 days: ", round(DOSE_D3), " mg.")
+         "AUC Day 1: ", round(AUC_D1, 2), " mg.min/mL.", "\n",
+         "Dose at day 3 to reach a target AUC of ", target_auc, " mg.min/mL over 3 days: ", round(DOSE_D3), " mg.")
 }
 
 # --- Secondly: The shiny app per se
@@ -34,7 +35,7 @@ ui <- fluidPage(
       fluidRow(
         h4("Administration"),
         column(width = 6,
-               numericInput("amt", "Dose (mg)", 500)
+               numericInput("amt", "Dose (mg)", 1000)
         ),
         column(width = 6,
                numericInput("dur", "Duration (h)", 1, min = .1)
@@ -43,14 +44,14 @@ ui <- fluidPage(
       fluidRow(
         h4("Observations"),
         column(width = 6,
-               numericInput("time1", "Time 1 (h)", 1.05),
+               numericInput("time1", "Time 1 (h)", .95),
                numericInput("time2", "Time 2 (h)", 1.9),
                numericInput("time3", "Time 3 (h)", 4.7)
         ),
         column(width = 6,
-               numericInput("dv1", "Conc 1 (mg/L)", 23.1),
-               numericInput("dv2", "Conc 2 (mg/L)", 14.6),
-               numericInput("dv3", "Conc 3 (mg/L)", 4.8)
+               numericInput("dv1", "Conc 1 (mg/L)", 35.3),
+               numericInput("dv2", "Conc 2 (mg/L)", 22.1),
+               numericInput("dv3", "Conc 3 (mg/L)", 6.7)
         )
       ),
       fluidRow(
@@ -58,7 +59,7 @@ ui <- fluidPage(
         column(width = 6,
                numericInput("bsa","BSA (m2)", 1.73)),
         column(width = 6,
-               numericInput("auc", "Target AUC (mg.h/mL)", 24))
+               numericInput("auc", "Target AUC (mg.min/mL)", 24))
       ),
       fluidRow(
         h4("Perfom estimation"),
@@ -92,11 +93,11 @@ server <- function(input, output) {
       obs_lines(time = c(input$time1, input$time2, input$time3),
                 DV = c(input$dv1, input$dv2, input$dv3)) %>%
       add_covariates(list(BSA = input$bsa)) %>%
-      see_data()
+      get_data()
   })
   
   my_est <- eventReactive(input$GO, {
-    mbrest(my_model, my_data(), verbose = F)
+    mapbayest(my_model, my_data(), verbose = F)
   })
   
   output$mapbay_tab <- renderTable({
@@ -115,14 +116,14 @@ server <- function(input, output) {
   })
   
   output$concvstime <- renderPlot({
-    mapbayr:::plot.mbrests(my_est())
+    mapbayr:::plot.mapbayests(my_est())
     #We can also use :
     # shiny::req(my_est())
     # plot(my_est())
   })
   
   output$distparam <- renderPlot({
-    mapbayr:::hist.mbrests(my_est())
+    mapbayr:::hist.mapbayests(my_est())
   })
   
   
