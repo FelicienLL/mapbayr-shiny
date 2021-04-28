@@ -18,7 +18,7 @@ shiny::runGitHub("mapbayr-shiny", "FelicienLL", ref = "main", subdir = "901-carb
 
 You can also clone or download the repository on your machine.
 
-![](appshiny901.png)<!-- -->
+![Screenshot](appshiny_901.png)<!-- -->
 
 
 ### Warning !
