@@ -92,7 +92,7 @@ server <- function(input, output) {
       adm_lines(time = 0, amt = input$amt, rate = (input$amt)/(input$dur)) %>%
       obs_lines(time = c(input$time1, input$time2, input$time3),
                 DV = c(input$dv1, input$dv2, input$dv3)) %>%
-      add_covariates(list(BSA = input$bsa)) %>%
+      add_covariates(covariates = list(BSA = input$bsa)) %>%
       get_data()
   })
   

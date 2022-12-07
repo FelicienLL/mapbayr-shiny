@@ -85,7 +85,7 @@ server <- function(input, output) {
       obs_lines(time = 24+c(input$time1, input$time2, input$time3),
                 DV = c(input$dv1, input$dv2, input$dv3),
                 DVmet = c(input$dv1met, input$dv2met, input$dv3met)) %>%
-      add_covariates(list(BSA = input$bsa)) %>%
+      add_covariates(covariates = list(BSA = input$bsa)) %>%
       get_data()
   })
   

@@ -98,9 +98,9 @@ server <- function(input, output) {
       adm_lines(time = 0, amt = (input$amt), rate = (input$amt)/(input$dur)) %>%
       obs_lines(time = c(input$time1,input$time2,input$time3,input$time4),
                 DV = c(input$dv1,input$dv2,input$dv3,input$dv4)) %>%
-      add_covariates(list(AGE = input$age, SCR = input$scr)) %>%
+      add_covariates(covariates = list(AGE = input$age, SCR = input$scr)) %>%
       get_data() %>% 
-      dplyr::filter(!((mdv==0)&(is.na(time)|is.na(DV))))
+      dplyr::filter(!((evid==0)&(is.na(time)|is.na(DV))))
   })
   
   my_est <- eventReactive(input$GO, {

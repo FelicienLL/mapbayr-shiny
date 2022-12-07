@@ -29,7 +29,7 @@ adapt_pazo <- function(est, ii, target, ss){
         est %>% 
           use_posterior() %>% 
           adm_lines(amt = iAMT, ii = iII, addl = iADDL) %>%
-          add_covariates() %>% 
+          add_covariates(CYCLE = 1) %>% 
           obsonly() %>% 
           mrgsim(start = iTSIM, end = iTSIM) %>% 
           as.data.frame() %>% 
@@ -86,14 +86,13 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   my_data <- reactive({
-    
     tldos <- (input$ii)*(input$addl-1)
     
     my_model %>%
       adm_lines(time = 0, amt = input$amt, ii = input$ii, addl = (input$addl)-1) %>%
       obs_lines(time = (input$time1 + tldos), DV = input$dv1) %>%
       obs_lines(time = (input$ii + tldos), DV = NA_real_, mdv = 1) %>% 
-      add_covariates() %>%
+      add_covariates(CYCLE = 1) %>%
       get_data()
   })
   
@@ -117,6 +116,7 @@ server <- function(input, output) {
       as.data.frame(my_est())
     }
   })
+  
   output$concvstime <- renderPlot({
     mapbayr:::plot.mapbayests(my_est())+ggplot2::geom_hline(yintercept = input$target, linetype = 2)
     #We can also use :

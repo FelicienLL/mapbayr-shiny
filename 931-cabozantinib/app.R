@@ -112,7 +112,7 @@ server <- function(input, output) {
       adm_lines(time = 0, amt = input$amt, ii = input$ii, addl = (input$addl)-1) %>%
       obs_lines(time = (input$time1 + tldos), DV = input$dv1) %>%
       obs_lines(time = (input$ii + tldos), DV = NA_real_, mdv = 1) %>% 
-      add_covariates(list_cov) %>%
+      add_covariates(covariates = list_cov) %>%
       get_data()
   })
   
@@ -137,7 +137,7 @@ server <- function(input, output) {
     }
   })
   output$concvstime <- renderPlot({
-    mapbayr:::plot.mapbayests(my_est())+ggplot2::geom_hline(yintercept = input$target, linetype = 2)
+    mapbayr:::plot.mapbayests(my_est(), delta = .1)+ggplot2::geom_hline(yintercept = input$target, linetype = 2)
     #We can also use :
     # shiny::req(my_est())
     # plot(my_est())
