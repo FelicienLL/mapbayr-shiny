@@ -90,7 +90,7 @@ server <- function(input, output) {
   })
   
   my_est <- eventReactive(input$GO, {
-    mapbayest(my_model, my_data(), verbose = F)
+    mapbayest(my_model, my_data(), verbose = F, check = F)
   })
   
   output$mapbay_tab <- renderTable({
